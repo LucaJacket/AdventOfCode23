@@ -1,12 +1,13 @@
 import re
+import math
 
 
 games = {}
 
 
-def initialize_games(input):
+def init_games(input):
     global games
-    for line in input.split("\n"):
+    for line in input:
         cubes = {
             "red": 0,
             "green": 0,
@@ -24,11 +25,11 @@ def solution_1():
 
 
 def solution_2():
-    return sum(cubes["red"] * cubes["green"] * cubes["blue"] for cubes in games.values())
+    return sum(math.prod(cubes.values()) for cubes in games.values())
 
 
 if __name__ == '__main__':
-    input = open("input.txt").read()
-    initialize_games(input)
+    input = open("input.txt").readlines()
+    init_games(input)
     print(solution_1())
     print(solution_2())
