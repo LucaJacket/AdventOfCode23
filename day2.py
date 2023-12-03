@@ -28,7 +28,7 @@ def solution_2():
     return sum(math.prod(cubes.values()) for cubes in games.values())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     input = open("input.txt").readlines()
     init_games(input)
     print(solution_1())

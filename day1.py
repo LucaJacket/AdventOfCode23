@@ -2,7 +2,7 @@ import re
 
 
 def solution_1(input):
-    return sum(int(line[0] + line[-1]) for line in re.sub(r"[A-Za-z]", "", input).split("\n"))
+    return sum([int(line[0] + line[-1]) for line in re.sub(r"[A-Za-z]", "", input).split("\n")])
 
 
 def solution_2(input):
@@ -22,7 +22,7 @@ def solution_2(input):
     return solution_1(input)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     input = open("input.txt").read()
     print(solution_1(input))
     print(solution_2(input))
