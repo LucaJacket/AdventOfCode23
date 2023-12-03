@@ -22,7 +22,7 @@ def solution_2(input):
     return solution_1(input)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     input = open("input.txt").read()
     print(solution_1(input))
     print(solution_2(input))
