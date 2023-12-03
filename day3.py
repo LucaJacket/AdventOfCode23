@@ -18,11 +18,11 @@ def init_symbols(input):
 
 
 def solution_1():
-    return sum(sum(n_list) for n_list in symbols.values())
+    return sum([sum(n_list) for n_list in symbols.values()])
 
 
 def solution_2():
-    return sum(math.prod(n_list) for n_list in symbols.values() if len(n_list) == 2)
+    return sum([math.prod(n_list) for n_list in symbols.values() if len(n_list) == 2])
 
 
 if __name__ == "__main__":
