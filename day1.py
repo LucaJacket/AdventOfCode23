@@ -1,11 +1,12 @@
 import re
 
 
-def solution_1(input):
-    return sum([int(line[0] + line[-1]) for line in re.sub(r"[A-Za-z]", "", input).split("\n")])
+def f(line: str):
+    x = re.findall(r"(\d)", line)
+    return int(x[0] + x[-1])
 
 
-def solution_2(input):
+def t(line: str):
     str2num = {
         "one": "o1e",
         "two": "t2o",
@@ -18,11 +19,10 @@ def solution_2(input):
         "nine": "n9e"
     }
     for k, v in str2num.items():
-        input = input.replace(k, v)
-    return solution_1(input)
+        line = line.replace(k, v)
+    return line
 
 
-if __name__ == "__main__":
-    input = open("input.txt").read()
-    print(solution_1(input))
-    print(solution_2(input))
+data = open("input.txt").readlines()
+print(sum(map(f, data)))
+print(sum(map(f, map(t, data))))

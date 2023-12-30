@@ -1,54 +1,38 @@
 import math
 
-raw_workflows, raw_parts = open("test.txt").read().split("\n\n")
-workflows = {n: r.split(",") for n, r in [workflow[:-1].split("{") for workflow in raw_workflows.splitlines()]}
-parts = [{k: int(v) for k, v in [eq.split("=") for eq in part[1:-1].split(",")]} for part in raw_parts.splitlines()]
+workflows, parts = open("input.txt").read().split("\n\n")
+workflows = {n: r.split(",") for n, r in [w[:-1].split("{") for w in workflows.splitlines()]}
+parts = [{k: int(v) for k, v in [eq.split("=") for eq in p[1:-1].split(",")]} for p in parts.splitlines()]
 
 
-def is_accepted(part: dict):
-    cur = "in"
-    while cur not in "AR":
-        for r in workflows[cur]:
-            if ":" not in r:
-                cur = r  # r is the 'else' destination
-            else:
-                expr, dest = r.split(":")
-                val1 = part[expr[0]]
-                op = expr[1]
-                val2 = int(expr[2:])
-                if (op == ">" and val1 > val2) or (op == "<" and val1 < val2):
-                    cur = dest
-                    break
-    return cur == "A"
+def f(rng: dict, name="in", i=0):
+    match name:
+        case "A":
+            return math.prod(b - a + 1 for a, b in rng.values())
+        case "R":
+            return 0
+        case _:
+            match workflows[name][i].split(":"):
+                case [expr, dest]:
+                    val1, gt, val2 = expr[0], expr[1] == ">", int(expr[2:])
+                    acc_rng = (val2 + 1, 4000) if gt else (1, val2 - 1)
+                    if rng[val1][0] <= rng[val1][1] < acc_rng[0] or acc_rng[1] < rng[val1][0] <= rng[val1][1]:
+                        return f(rng, name, i + 1)
+                    elif acc_rng[0] <= rng[val1][0] <= rng[val1][1] <= acc_rng[1]:
+                        return f(rng, dest)
+                    elif rng[val1][0] < acc_rng[0] <= rng[val1][1]:
+                        sup = rng.copy()
+                        sup[val1] = (acc_rng[0], sup[val1][1])
+                        rng[val1] = (rng[val1][0], acc_rng[0] - 1)
+                        return f(sup, dest) + f(rng, name, i + 1)
+                    elif rng[val1][0] <= acc_rng[1] < rng[val1][1]:
+                        inf = rng.copy()
+                        inf[val1] = (inf[val1][0], acc_rng[1])
+                        rng[val1] = (acc_rng[1] + 1, rng[val1][1])
+                        return f(inf, dest) + f(rng, name, i + 1)
+                case [dest]:
+                    return f(rng, dest)
 
 
-def solution_1():
-    return sum(sum(part.values()) for part in parts if is_accepted(part))
-
-
-def accepted(name: str, ranges: dict, i: int = 0):
-    if name == "A":
-        return math.prod(b - a + 1 for a, b in ranges.values())
-    elif name == "R":
-        return 0
-    else:
-        r = workflows[name][i]
-        if ":" not in r:
-            return accepted(r, ranges)  # r is the 'else' destination
-        else:
-            expr, dest = r.split(":")
-            n_ranges = ranges.copy()
-            op = expr[1]
-            val = int(expr[2:])
-            n_ranges[expr[0]] = (n_ranges[expr[0]][0], val - 1) if op == "<" else (val + 1, n_ranges[expr[0]][1])
-            ranges[expr[0]] = (ranges[expr[0]][0], val) if op == ">" else (val, ranges[expr[0]][1])
-            return accepted(dest, n_ranges) + accepted(name, ranges, i + 1)
-
-
-def solution_2():
-    return accepted("in", {k: (1, 4000) for k in "xmas"})
-
-
-if __name__ == "__main__":
-    print(solution_1())
-    print(solution_2())
+print(sum(sum(p.values()) for p in parts if f({k: (p[k], p[k]) for k in "xmas"})))
+print(f({k: (1, 4000) for k in "xmas"}))

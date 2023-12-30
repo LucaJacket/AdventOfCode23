@@ -1,42 +1,19 @@
 import math
 import re
 
-moves = ""
-nodes = {}
+moves, _, *graph = open("input.txt").read().splitlines()
+graph = {n: d for n, *d in [re.findall(r"\w+", l) for l in graph]}
 
 
-def init_moves_nodes(input):
-    global moves
-    global nodes
-    moves, input = input.split("\n\n")
-    nodes = {
-        name: {
-            "L": left,
-            "R": right
-        }
-        for name, left, right in [line.split() for line in re.sub("[=(,)]", "", input).split("\n")]}
+def steps(pos: str):
+    i = 0
+    while not pos.endswith("Z"):
+        move = moves[i % len(moves)]
+        pos = graph[pos][move == "R"]
+        i += 1
+    return i
 
 
-def steps(start, *end):
-    count = 0
-    while start not in end:
-        start = nodes[start][moves[count % len(moves)]]
-        count += 1
-    return count
-
-
-def solution_1():
-    return steps("AAA", "ZZZ")
-
-
-def solution_2():
-    ends = [node for node in nodes.keys() if node.endswith("Z")]
-    return math.lcm(*[steps(node, *ends) for node in nodes.keys() if node.endswith("A")])
-
-
-if __name__ == "__main__":
-    input = open("input.txt").read()
-    init_moves_nodes(input)
-    print(solution_1())
-    print(solution_2())
+print(steps("AAA"))
+print(math.lcm(*map(steps, [x for x in graph if x.endswith("A")])))
 

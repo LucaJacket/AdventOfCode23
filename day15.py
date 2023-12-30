@@ -1,50 +1,21 @@
-steps = open("input.txt").read().split(",")
+data = open("input.txt").read().split(",")
 
 
-def convert(str):
+def hash(s: str):
     i = 0
-    for c in str:
-        i += ord(c)
-        i *= 17
-        i %= 256
+    for c in s:
+        i = (i + ord(c)) * 17 % 256
     return i
 
 
-def solution_1():
-    return sum(convert(step) for step in steps)
+print(sum(map(hash, data)))
 
+boxes = [{} for _ in range(256)]
+for step in data:
+    match step.strip("-").split("="):
+        case [l, p]:
+            boxes[hash(l)][l] = int(p)
+        case [l]:
+            boxes[hash(l)].pop(l, 0)
 
-boxes = [[] for _ in range(256)]
-
-
-def init_boxes():
-    for step in steps:
-        if "=" in step:
-            label, power = step.split("=")
-            box = convert(label)
-            try:
-                i = [lens[0] for lens in boxes[box]].index(label)
-                boxes[box][i] = (label, int(power))
-            except ValueError:
-                boxes[box].append((label, int(power)))
-        elif "-" in step:
-            label = step.split("-")[0]
-            box = convert(label)
-            try:
-                i = [lens[0] for lens in boxes[box]].index(label)
-                boxes[box].pop(i)
-            except ValueError:
-                continue
-        else:
-            raise ValueError("No '=' or '-' in step")
-
-
-def solution_2():
-    init_boxes()
-    return sum(sum((1 + box) * (1 + slot) * boxes[box][slot][1] for slot in range(len(boxes[box])))
-               for box in range(256))
-
-
-if __name__ == "__main__":
-    print(solution_1())
-    print(solution_2())
+print(sum(i * j * p for i, box in enumerate(boxes, 1) for j, p in enumerate(box.values(), 1)))
